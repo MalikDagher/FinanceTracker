@@ -33,9 +33,12 @@ class CSV:
     @classmethod
     def get_transactions(cls, start_date, end_date):
         df = pd.read_csv(cls.CSV_FILE)
-        df["date"] = pd.to_datetime(df["date"], format = CSV.FORMAT)
+        df["date"] = pd.to_datetime(df["date"].str.strip(), format=CSV.FORMAT, errors='coerce')
         start_date = datetime.strptime(start_date, CSV.FORMAT)
         end_date = datetime.strptime(end_date, CSV.FORMAT)
+
+    # Remove any rows with invalid date parsing (if any)
+        df = df.dropna(subset=["date"])
 
         mask = (df["date"] >= start_date) & (df["date"] <= end_date)
         filtered_df = df.loc[mask]
